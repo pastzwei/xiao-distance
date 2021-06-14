@@ -15,7 +15,7 @@
 
 #include <TimerTC3.h>
 
-#include <VL53L0X.h>
+#include <VL53L1X.h>
 
 #include <Adafruit_SSD1306.h>
 #include <Adafruit_GFX.h>
@@ -28,7 +28,7 @@
 #define SW 3 //トグルスイッチのピンNo.
 #define CS 7 //SDカードのChipSelect
 
-VL53L0X sensor;
+VL53L1X sensor;
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //グローバル変数系
@@ -43,13 +43,16 @@ void writing(int);
 void oled(boolean, int);
 
 void setup() {
+  delay(50);
   
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(SW, INPUT_PULLUP);
   Serial.begin(115200);
   Wire.begin();
+  Wire.setClock(400000);
   
   //OLEDのアロケーション 失敗したらLEDが1チカを繰り返して起動しない
+  delay(50);
   if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("SSD1306 allocation failed.");
     for(;;) {
@@ -62,7 +65,7 @@ void setup() {
   display.setTextColor(WHITE);
   display.setTextSize(1);
   
-  //測距センサのアロケーション 失敗したらLEDが2チカを繰り返して起動しない
+  //測距センサのイニシャライズ 失敗したらLEDが2チカを繰り返して起動しない
   sensor.setTimeout(500);
   if (!sensor.init()) {
     Serial.println("Failed to detect and initialize sensor.");
@@ -81,6 +84,9 @@ void setup() {
       delay(550);
     }
   }
+
+  sensor.setDistanceMode(VL53L1X::Medium);
+  sensor.setMeasurementTimingBudget(40000);
   
   //SDカードスロットのアロケーション 失敗したらnoSDモードで起動
   if (!SD.begin(CS)) {
@@ -88,7 +94,7 @@ void setup() {
   }
 
   //測距センサをback-to-backモードで起動
-  sensor.startContinuous();
+  sensor.startContinuous(50);
   
   //TimerTC3初期化
     TimerTc3.initialize(1000000 / FREQ);
@@ -98,7 +104,7 @@ void setup() {
 void measurement() {
 
   //各パラメータを収集
-  int distance = sensor.readRangeContinuousMillimeters();
+  int distance = sensor.read();
   if (sensor.timeoutOccurred()) {
     Serial.println("Sensor Timeout.");
     display.clearDisplay();
