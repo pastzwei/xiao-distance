@@ -1,5 +1,5 @@
 /*
- *Seeeduino XIAO + VL53L0Xレーザー測距 SDカード記録式データロガー Ver.1.0
+ *Seeeduino XIAO + VL53L0Xレーザー測距 SDカード記録式データロガー Ver.1.01
  *by sakuraiphysics 20210610
  *レーザー式の距離測定を行い、OLEDに表示しながらSDに記録するやつです。
  *ハードはMicroSDを採用していますが、そりゃあ別にどっちでも動くと思います。
@@ -164,7 +164,11 @@ void writing(int dist) {
   if (dataFile) {
     dataFile.print(number / 20);
     dataFile.print(".");
-    dataFile.print((number % 20) * 5);
+    if(number % 20 == 5) {
+      dataFile.print("05");
+    } else {
+      dataFile.print((number % 20) * 5);
+    }
     dataFile.print(",");
     dataFile.println(dist);
     dataFile.close();
@@ -178,7 +182,11 @@ void oled(boolean nowSW, int dist) {
   display.print("t = ");
   display.print(number / 20);
   display.print(".");
-  display.println((number % 20) * 5);
+  if(number % 20 == 5) {
+    display.print("05");
+  } else {
+    display.print((number % 20) * 5);
+  }
   display.print("x = ");
   display.println(dist);
 
