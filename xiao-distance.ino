@@ -164,7 +164,7 @@ void writing(int dist) {
   if (dataFile) {
     dataFile.print(number / 20);
     dataFile.print(".");
-    if(number % 20 == 5) {
+    if(number % 20 == 1) {
       dataFile.print("05");
     } else {
       dataFile.print((number % 20) * 5);
@@ -182,10 +182,10 @@ void oled(boolean nowSW, int dist) {
   display.print("t = ");
   display.print(number / 20);
   display.print(".");
-  if(number % 20 == 5) {
-    display.print("05");
+  if(number % 20 == 1) {
+    display.println("05");
   } else {
-    display.print((number % 20) * 5);
+    display.println((number % 20) * 5);
   }
   display.print("x = ");
   display.println(dist);
